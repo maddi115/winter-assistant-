@@ -1,0 +1,101 @@
+🍄 Sunset memory sculpting, implement RAG-based conversation retrieval
+
+## What Changed
+
+### 1. Removed Memory Sculpting (Sunset 🌅)
+- Memory sculpting was unreliable and slow (~30s per turn)
+- Required complex prompt engineering with inconsistent JSON extraction
+- Needed Redis fact/state management that wasn't working well
+- Required higher-level infrastructure (knowledge graphs, conflict resolution)
+  to be truly effective
+
+### 2. Implemented LanceDB Vector Database
+**Storage:**
+- Every conversation turn embedded as 384-dimensional vector
+- Full conversation text + embeddings stored in `lance_db/conversations.lance`
+- Fast local embeddings via sentence-transformers (all-MiniLM-L6-v2)
+- Auto-generated 3-word conversation titles
+
+**Files Added:**
+- `lancedb_conversation_manager.py` - Core storage with embeddings
+- `conversation_selector.py` - UI for selecting/creating conversations
+- `lancedb_ui.py` - Menu components
+- `lancedb_assistant.py` - Main entry point with RAG
+- `test_lancedb.py` - Verification tests
+
+### 3. Implemented RAG (Retrieval Augmented Generation)
+**How it works:**
+- AI doesn't read entire conversation history (would be slow/expensive)
+- Instead, retrieves only relevant context via hybrid approach:
+  - Last 3 turns (recency)
+  - 3 semantically similar turns (vector search)
+  - Combines, deduplicates, sorts chronologically
+- AI sees 3-6 turns max, not 100+
+
+**Benefits:**
+- Fast: ~1s embedding vs ~30s sculpting
+- Accurate: Semantic search finds relevant context
+- Scalable: Works with thousands of turns
+- Simple: No complex extraction/validation needed
+
+### 4. Updated winter_core.py
+- Added `conversation_history` parameter to `chat()` method
+- AI now receives retrieved conversation context
+- Memory persists across turns via semantic retrieval
+
+## Why This Approach
+
+**Memory sculpting needed:**
+- Reliable entity extraction
+- Knowledge graph infrastructure  
+- Conflict resolution
+- Sophisticated state management
+- Works better as offline batch process
+
+**RAG provides:**
+- ✅ Searchable conversation history
+- ✅ Semantic retrieval of relevant context
+- ✅ In-conversation memory via context window
+- ✅ Fast, reliable, proven approach
+- ✅ Standard solution for LLM memory (used industry-wide)
+
+## Architecture
+```
+User Query
+    ↓
+Recent Context (3 turns) + Semantic Search (3 turns)
+    ↓
+Deduplicate & Sort
+    ↓
+Pass to AI (3-6 turns max)
+    ↓
+Generate Response
+    ↓
+Embed & Store in LanceDB
+```
+
+## Usage
+
+**Old system:** `python assistant.py` (JSONL files, memory sculpting)
+**New system:** `python lancedb_assistant.py` (RAG with vector search)
+
+**Commands:**
+- `history` - View recent turns
+- `search <query>` - Semantic search across all conversations
+- `memory` - View Redis project memory (still available for projects)
+- `quit` - Exit
+
+## Future Considerations
+
+For business/market research use cases, consider adding:
+- Graph DB (Neo4j) for entity/relationship tracking
+- Entity extraction pipeline
+- Hybrid retrieval: Graph structure + Vector semantics
+
+## Dependencies Added
+
+- lancedb==0.26.1
+- sentence-transformers==5.2.0
+- torch==2.9.1
+- pandas==2.3.3
+- polars==1.36.1
