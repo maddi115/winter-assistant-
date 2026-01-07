@@ -1,2 +1,10 @@
+# Core AI & Storage
 redis==5.0.1
-reverse_geocoder
+lancedb==0.26.1
+sentence-transformers==5.2.0
+torch==2.9.1
+pandas==2.3.3
+polars==1.36.1
+
+# Utilities
+reverse_geocoder==1.5.1

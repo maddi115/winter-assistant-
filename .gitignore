@@ -8,13 +8,14 @@ venv/
 env/
 ENV/
 
-# LanceDB
+# Storage
 lance_db/
+conversations_fallback/
 
 # Backups
 backup_*/
 
-# Conversations
+# Conversations (legacy)
 conversations/
 
 # IDE
@@ -27,5 +28,8 @@ conversations/
 .DS_Store
 Thumbs.db
 
-# Redis dumps
+# Redis
 dump.rdb
+
+# Environment
+.env
