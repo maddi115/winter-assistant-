@@ -1,7 +1,31 @@
-venv/
+# Python
 __pycache__/
-*.pyc
-exports/
+*.py[cod]
+*$py.class
+*.so
+.Python
+venv/
+env/
+ENV/
+
+# LanceDB
+lance_db/
+
+# Backups
+backup_*/
+
+# Conversations
 conversations/
-archive/
-*.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Redis dumps
+dump.rdb
